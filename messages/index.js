@@ -1,31 +1,30 @@
-"use strict";
-var builder = require("botbuilder");
-var botbuilder_azure = require("botbuilder-azure");
-var path = require('path');
+'use strict';
 
-var useEmulator = (process.env.NODE_ENV == 'development');
+const builder = require('botbuilder');
+const botbuilder_azure = require('botbuilder-azure');
+const path = require('path');
 
-var connector = useEmulator ? new builder.ChatConnector() : new botbuilder_azure.BotServiceConnector({
-    appId: process.env['MicrosoftAppId'],
-    appPassword: process.env['MicrosoftAppPassword'],
-    stateEndpoint: process.env['BotStateEndpoint'],
-    openIdMetadata: process.env['BotOpenIdMetadata']
+require('dotenv').config();
+
+const utils = require('./businesslogic/utils');
+
+const connector = utils.getConnector(builder);
+
+const bot = new builder.UniversalBot(connector, {
+    localizerSettings: {
+        defaultLocale: process.env.DEFAULT_LOCALE
+    }
 });
 
-var bot = new builder.UniversalBot(connector);
 bot.localePath(path.join(__dirname, './locale'));
 
-bot.dialog('/', function (session) {
-    session.send('You said ' + session.message.text);
-});
+bot.dialog('/', (session) => session.send('You said ' + session.message.text));
 
-if (useEmulator) {
-    var restify = require('restify');
-    var server = restify.createServer();
-    server.listen(3978, function() {
-        console.log('test bot endpont at http://localhost:3978/api/messages');
-    });
-    server.post('/api/messages', connector.listen());    
-} else {
-    module.exports = { default: connector.listen() }
-}
+bot.dialog('/Cancelar', [
+    function (session) {
+        session.endDialog(`No hay problemas ${session.message.user.name.split(" ", 1)[0]}, hasta la próxima.`)
+    }
+]).triggerAction({ matches: /^cancelar$|^salir$|^terminar$|^exit$|^quit$/i });
+
+module.exports = utils.startServer(connector);
+
