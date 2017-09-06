@@ -57,3 +57,9 @@ typings/
 # dotenv environment variables file
 .env
 
+**/*/node_modules/
+typings/
+node_modules/
+*.js.map
+
+*.ini
