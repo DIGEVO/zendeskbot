@@ -21,9 +21,8 @@ bot.localePath(path.join(__dirname, './locale'));
 bot.dialog('/', (session) => session.send('You said ' + session.message.text));
 
 bot.dialog('/Cancelar', [
-    function (session) {
+    (session) =>
         session.endDialog(`No hay problemas ${session.message.user.name.split(" ", 1)[0]}, hasta la próxima.`)
-    }
 ]).triggerAction({ matches: /^cancelar$|^salir$|^terminar$|^exit$|^quit$/i });
 
 module.exports = utils.startServer(connector);

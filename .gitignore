@@ -63,3 +63,5 @@ node_modules/
 *.js.map
 
 *.ini
+
+test.js
